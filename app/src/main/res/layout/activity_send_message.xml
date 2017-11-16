@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9F9F9"
+    tools:context="com.example.geeonepassdemo.SendMessageActivity">
+    <RelativeLayout
+        android:id="@+id/gtm_rl"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#644CEA">
+
+        <ImageView
+            android:id="@+id/gtm_back_iv"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginLeft="14dp"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/back" />
+
+        <TextView
+            android:id="@+id/tv_msg_title"
+            android:layout_width="64dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="72dp"
+            android:text="快捷登录"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/gtm_send_ll"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="12dp"
+        android:layout_height="20dp"
+        android:layout_below="@+id/gtm_rl"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:id="@+id/tv_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:textColor="#cccccc" />
+
+        <TextView
+            android:id="@+id/tv_msg"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="12dp"
+            android:layout_centerVertical="true"
+            android:textColor="#cccccc" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_msg"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_height="60dp"
+        android:padding="10dp"
+        android:layout_below="@+id/gtm_send_ll"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:hint="请输入短信验证码"
+        android:inputType="phone"
+        android:theme="@style/MyEditText" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#c7c7c7" />
+
+        <Button
+            android:id="@+id/btn_msg"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ripple_bg_drawable"
+            android:text="下一步"
+            android:textColor="#ffffff"
+            android:textSize="18sp" />
+    </RelativeLayout>
+</RelativeLayout>

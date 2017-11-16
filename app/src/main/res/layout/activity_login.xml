@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gtm_draw_background"
+    tools:context="com.example.geeonepassdemo.LoginActivity">
+
+    <ImageView
+        android:id="@+id/gtm_iv"
+        android:layout_width="160dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/gtm_draw_logo2" />
+
+    <LinearLayout
+        android:id="@+id/gtm_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:alpha="0"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/gtm_btn1"
+            android:layout_width="250dp"
+            android:layout_height="48dp"
+            android:background="@drawable/ripple_bg1_login"
+            android:text="快捷登录"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/gtm_btn2"
+            android:layout_width="250dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/ripple_bg2_login"
+            android:text="注册"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="141dp"
+            android:layout_height="15dp"
+            android:layout_marginTop="67dp"
+            android:alpha="0.5"
+            android:gravity="center"
+            android:text="极验短信验证Demo"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="141dp"
+            android:layout_height="13dp"
+            android:layout_marginBottom="15dp"
+            android:alpha="0.5"
+            android:gravity="center"
+            android:text="Powered By Geetest 2017"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+</RelativeLayout>
