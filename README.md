@@ -34,9 +34,22 @@ repositories {
 并且要手动将aar包添加依赖：
 
 ```java
-compile(name: 'geetest_message_android_v1.x.y', ext: 'aar')
+compile(name: 'geetest_onepass_android_v1.x.y', ext: 'aar')
 
 ``` 
+
+3. 添加权限
+
+```java
+ <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+ <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+ <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+ <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+ <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+ <uses-permission android:name="android.permission.INTERNET" />
+ <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
+```
 
 ## 配置接口
 
@@ -64,19 +77,18 @@ compile(name: 'geetest_message_android_v1.x.y', ext: 'aar')
 在项目的具体页面的`onCreate`方法里面进行初始化。
 	
 ```java
-gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
+gopGeetestUtils = GopGeetestUtils.getInstance(MainActivity.this);
 
 ``` 
 
 ### 点击执行
 
 ```java
-gopGeetestUtils.getOnePass(MainActivity.this, parmas, editText.getText().toString(),CUSTOM_ID,gtmLinster);
-//第一个参数为上下文
-//第二个参数为要传给sdk的请求数据
-//第三个参数为输入的手机号码
-//第四个参数为所需要配置的CUSTOM_ID
-//第五个参数为所需接口
+gopGeetestUtils.getOnePass( editText.getText().toString(),validate,CUSTOM_ID,gopLinster);
+//第一个参数为输入的手机号码
+//第二个参数为验证的validate
+//第三个参数为所需要配置的CUSTOM_ID
+//第四个参数为所需接口
 
 ``` 
  
@@ -85,24 +97,19 @@ gopGeetestUtils.getOnePass(MainActivity.this, parmas, editText.getText().toStrin
 实现接口进行校验。
 
 ```java
-GOPListenerUtils gopLinster=new GOPListenerUtils() {
+BaseGopListener gopLinster=new BaseGopListener() {
 	@Override
-	public void gopOnReady(boolean result) {
-		//自定义加载动画的开关。当为ture的时候表示验证码准备显示出来，此时自定义loading进行关闭；当为false的时候，验证码验证成功，继续自定义loading展示。
-	}
-
-	@Override
-	public void gopOnError(String error) {
+	public void gopErrorMessage(String error) {
 		//过程中出现的错误
 	}
 
 	@Override
-	public void gopOnSendMsg(boolean canSendMSG，Map<String, String> result) {
+	public void gopSendMsg(boolean canSendMSG，Map<String, String> result) {
 		//sdk内部发送短信所需要的结果，当为true的时候表示sdk内部发送短信，false的时候自定义短信
 	}
 
 	@Override
-	public void gopOnResult(Map<String, String> result) {
+	public void gopResult(Map<String, String> result) {
 		//网关校验拿到的结果，自定义进行校验
 	}
 };
@@ -110,11 +117,7 @@ GOPListenerUtils gopLinster=new GOPListenerUtils() {
 额外接口实现。
 
 ```java
-   gopOnCancelDialog():关闭验证码的接口
-   gopOnCloseDialog();点击页面关闭键取消验证码的接口
-   gopOnLanguage();验证码的语言，默认为系统语言
-   gopOnChangePhone();当为true的时候，表示由sdk内部判断手机号格式，false为外部判断。默认为false
-   gopOnDobble();此接口用于未收到短信，进行再次请求时调用，默认为false
+   gopGateWay();此接口用于未收到短信，进行再次请求时调用，默认为false
    
 ``` 
 ### 页面关闭
@@ -140,7 +143,7 @@ protected void onDestroy() {
 
 	
 ```
-public GOPGeetestUtils(Context context)
+public GopGeetestUtils(Context context)
 ```
 
 ### 参数说明
@@ -158,23 +161,22 @@ costomID：产品id，请在官网申请
 configUrl:初始化接口，网站主使用onepass的服务端sdk搭建
 
 ```
-public void getOnePass(Context context，String params，String phone,String customID,GOPListenerUtils gopListener)
+public void getOnePass(String phone,String validate,String customID,BaseGopListener gopListener)
 ```
 
 ### 参数说明
 
 参数	|类型 |说明| 			
 ------	|-----|-----|
-context|Context|activity的上下文|
-params|String|configUrl的请求结果|
 phone|String|用户所填的手机号|
+validate|String|接口返回的validate|
 customID|String|产品id|
-gopListener| GOPListenerUtils|回调监听器，需要开发者自己实现|
+gopListener| BaseGopListener|回调监听器，需要开发者自己实现|
 
 ### 代码示例
 
 ```
-gopGeetestUtils.getOnePass(MainActivity.this,params,phone,customid,gopListener)
+gopGeetestUtils.getOnePass(phone,validate，customid,gopListener)
 ```
 
 ## 回调监听
@@ -190,7 +192,7 @@ checkMessageUrl：onepass校验接口，网站主使用onepass的服务端sdk搭
 整个流程出现错误的时候调用
 	
 ```
-public gopOnError(String error)
+public gopErrorMessage(String error)
 
 ```
 
@@ -207,7 +209,7 @@ error | String |错误码|
 整个流程网关成功之后调用
 	
 ```
-public gopOnResult(Map<String,String> result)
+public gopResult(Map<String,String> result)
 
 ```
 
@@ -240,7 +242,7 @@ result|int|当等于0的时候表示成功，2的时候表示需要提交费用�
 整个流程进行发送短信调用
 	
 ```
-public gopOnSendMsg(boolean data，Map<String,String> result)
+public gopSendMsg(boolean data，Map<String,String> result)
 
 ```
 
@@ -289,10 +291,7 @@ gopGeetestUtils.cancelUtils()
 
 error	|说明| 			
 ------	|-----|
-`211`|configUrl出错|
-`200`|ajax forbidden|
-`201`|验证timeout|
-`204`|webview error|
+`235`|服务请求出错|
 
 
 	

@@ -27,10 +27,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.geetest.onepass.GOPHttpUtils;
-import com.geetest.onepass.geetest.GOPGeetestUtils;
-import com.geetest.onepass.geetest.GOPListenerUtils;
-
+import com.geetest.onepass.BaseGopListener;
+import com.geetest.onepass.GopGeetestUtils;
+import com.geetest.onepass.GopHttpUtils;
+import com.geetest.testbutton.geetest.BaseGT3Listener;
+import com.geetest.testbutton.geetest.GT3GeetestUtils;
 
 import org.json.JSONObject;
 
@@ -50,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
     /**
      * geetest的工具类
      */
-    private GOPGeetestUtils gtmGeetestUtils;
+    private GopGeetestUtils gopGeetestUtils;
+    private GT3GeetestUtils gt3GeetestUtils;
     /**
      * 服务器配置的verifyUrl接口
      */
@@ -62,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 配置的customid
      */
-    private static final String CUSTOM_ID = "";
+    private static final String CUSTOM_ID = "fd2cf5e6589a7ceccbc1cc57f6b299a4";
     private ProgressDialog progressDialog;
-    private DemoProgress demoProgress;
+
     /**
      * 新map保存结果用于校验结果
      */
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawable(null);
         TextView textView = (TextView) findViewById(R.id.gtop_title_name);
         textView.setText(new GTMTextUtils().getText());
-       //拿到这个权限可以更方便的进行网关验证
+        //拿到这个权限可以更方便的进行网关验证
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -86,13 +88,19 @@ public class MainActivity extends AppCompatActivity {
             //TODO
         }
         init();
+        initGT3();
+        initGop();
+    }
+
+    private void initGT3() {
+        gt3GeetestUtils = GT3GeetestUtils.getInstance(MainActivity.this);
+    }
+
+    private void initGop() {
+        gopGeetestUtils = GopGeetestUtils.getInstance(MainActivity.this);
     }
 
     private void init() {
-
-        //初始化gtmGeetestUtils
-        gtmGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
-
         editText = (EditText) findViewById(R.id.et);
         button = (Button) findViewById(R.id.btn);
         textView = (TextView) findViewById(R.id.gtm_check_num_tv);
@@ -164,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
 
-            return GOPHttpUtils.readContentFromGet(CAPTCHA_URL);
+            return GopHttpUtils.readContentFromGet(CAPTCHA_URL);
 
         }
 
@@ -181,70 +189,65 @@ public class MainActivity extends AppCompatActivity {
                 /**   只有api1不为null的时候才能进行继续操作
                  *    第一个参数为上下文
                  *    第二个参数为要传给sdk内部的结果，格式为{"success": 1,"challenge": "85b5d5a9e255c32a37fd3a2d551983c6","gt": "019924a82c70bb123aae90d483087f94", "new_captcha": true}
-                 *    第三参数为填写的手机号
-                 *    第四个参数为customid
-                 *    第五个参数为回调
+                 *    第三个参数为回调
                  */
-                gtmGeetestUtils.getOnePass(MainActivity.this, parmas, editText.getText().toString(), CUSTOM_ID, new GOPListenerUtils() {
+                gt3GeetestUtils.getGeetest(MainActivity.this, parmas, new BaseGT3Listener() {
                     @Override
-                    public void gopOnError(String s) {
+                    public void gt3OnError(String s) {
                         //执行整个流程中的错误信息
                         toastUtil(s);
                         if (progressDialog != null) {
                             progressDialog.dismiss();
                         }
-                        if (demoProgress != null) {
-                            demoProgress.dismiss();
-                        }
                     }
 
                     @Override
-                    public void gopOnReady(boolean b) {
-                        //自定义加载框的开关，true的时候为验证码出来，进行加载框的关闭，false的时候为验证码验证成功，加载框重新加载
-                        if (b) {
-                            if (progressDialog != null) {
-                                progressDialog.dismiss();
+                    public void gt3OnResult(String challenge, String validate, String seccode) {
+                        /**
+                         *    第一参数为填写的手机号
+                         *    第二个参数为验证后的validate
+                         *    第三个参数为customid
+                         *    第四个参数为回调
+                         */
+                        gopGeetestUtils.getOnePass(editText.getText().toString(), validate, CUSTOM_ID, new BaseGopListener() {
+                            @Override
+                            public void gopErrorMessage(String error) {
+                                if (progressDialog != null) {
+                                    progressDialog.dismiss();
+                                }
+                                toastUtil(error);
                             }
-                        } else {
-                            demoProgress = new DemoProgress(MainActivity.this, R.style.CustomDialog);
-                            demoProgress.show();
 
-                        }
-                    }
-
-                    @Override
-                    public void gopOnResult(Map<String, String> result) {
-                        //处理网关的结果，真机认证，同时将返回在result进行post请求用于拿到结果
-                        getMap = result;
-                        Log.i("TTTTTTT",result.toString());
-                        new GtmNewTask().execute();
-                    }
-
-                    @Override
-                    public void gopOnSendMsg(boolean canSendMsg, Map<String, String> result) {
-                        //处理发送短信的通知，将这四个参数传到发短信页面进行短信验证
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                        }
-                        if (demoProgress != null) {
-                            demoProgress.dismiss();
-                        }
-                        if (canSendMsg) {
-                            Intent intent = new Intent(getApplicationContext(), SendMessageActivity.class);
-                            intent.putExtra("custom", result.get("custom"));
-                            intent.putExtra("phone", result.get("phone"));
-                            intent.putExtra("process_id", result.get("process_id"));
-                            intent.putExtra("message_id", result.get("message_id"));
-                            startActivity(intent);
-                        } else {
-                            toastUtil("自定义短信");
-                        }
+                            @Override
+                            public void gopResult(Map<String, String> result) {
+                                getMap = result;
+                                new GtmNewTask().execute();
+                            }
+                            @Override
+                            public void gopSendMsg(boolean success, Map<String, String> result) {
+                                if (progressDialog != null) {
+                                    progressDialog.dismiss();
+                                }
+                                if (success) {
+                                    Intent intent = new Intent(getApplicationContext(), SendMessageActivity.class);
+                                    intent.putExtra("custom", result.get("custom"));
+                                    intent.putExtra("phone", result.get("phone"));
+                                    intent.putExtra("process_id", result.get("process_id"));
+                                    intent.putExtra("message_id", result.get("message_id"));
+                                    startActivity(intent);
+                                } else {
+                                    toastUtil("自定义短信");
+                                }
+                            }
+                        });
                     }
                 });
+
             }
 
         }
     }
+
 
     /**
      * 自定义请求
@@ -254,38 +257,36 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             //网络请求需要自己写
-            return GOPHttpUtils.submitPostData2(GTM_GATEWAY, getMap, "utf-8");
+            return GopHttpUtils.submitPostData2(GTM_GATEWAY, getMap, "utf-8");
         }
 
         @Override
         protected void onPostExecute(String params) {
             if (TextUtils.isEmpty(params)) {
                 //结果异常则发送短信
-                gtmGeetestUtils.verifyMsg();
+                gopGeetestUtils.sendMsg();
             } else {
-                Log.i("TTTTTTT",params);
+                Log.i("TTTTTTT", params);
                 try {
                     JSONObject jsonObject = new JSONObject(params);
                     int result = jsonObject.getInt("result");
-                    if (result == GOPGeetestUtils.GTM_RESULT_SUCCESS) {
+                    if (result == GopGeetestUtils.GOP_RESULT_SUCCESS) {
                         //验证成功，进入验证成功页面
                         toastUtil("success");
                         if (progressDialog != null) {
                             progressDialog.dismiss();
                         }
-                        if (demoProgress != null) {
-                            demoProgress.dismiss();
-                        }
+
                         startActivity(new Intent(getApplicationContext(), SuccessActivity.class));
-                    } else if (result == GOPGeetestUtils.GTM_RESULT_ARREARS) {
+                    } else if (result == GopGeetestUtils.GOP_RESULT_ARREARS) {
                         toastUtil("您已经欠费");
                     } else {
                         //结果异常则发送短信
-                        gtmGeetestUtils.verifyMsg();
+                        gopGeetestUtils.sendMsg();
                     }
                 } catch (Exception e) {
                     //结果异常则发送短信
-                    gtmGeetestUtils.verifyMsg();
+                    gopGeetestUtils.sendMsg();
                 }
             }
 
@@ -319,7 +320,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         //销毁的时候执行
-        gtmGeetestUtils.cancelUtils();
+        gopGeetestUtils.cancelUtils();
+        gt3GeetestUtils.cancelUtils();
 
     }
 }
