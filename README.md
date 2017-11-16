@@ -85,7 +85,7 @@ gopGeetestUtils.getOnePass(MainActivity.this, parmas, editText.getText().toStrin
 实现接口进行校验。
 
 ```java
-GOPUtilsListener gopLinster=new GOPGeetestUtils.GOPUtilsListener() {
+GOPListenerUtils gopLinster=new GOPListenerUtils() {
 	@Override
 	public void gopOnReady(boolean result) {
 		//自定义加载动画的开关。当为ture的时候表示验证码准备显示出来，此时自定义loading进行关闭；当为false的时候，验证码验证成功，继续自定义loading展示。
