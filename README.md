@@ -117,8 +117,8 @@ BaseGopListener gopLinster=new BaseGopListener() {
 额外接口实现。
 
 ```java
-   gopGateWay();此接口用于未收到短信，进行再次请求时调用，默认为false
-   
+   gopGateWay();此接口用于未收到短信，进行再次请求时调用。
+   
 ``` 
 ### 页面关闭
 
@@ -291,6 +291,7 @@ gopGeetestUtils.cancelUtils()
 
 error	|说明| 			
 ------	|-----|
+`231`|网络未连接|
 `235`|服务请求出错|
 
 
