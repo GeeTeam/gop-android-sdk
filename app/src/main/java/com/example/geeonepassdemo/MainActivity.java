@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 配置的customid
      */
-    private static final String CUSTOM_ID = "fd2cf5e6589a7ceccbc1cc57f6b299a4";
+    private static final String CUSTOM_ID = "";
     private ProgressDialog progressDialog;
 
     /**
