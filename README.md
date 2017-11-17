@@ -11,6 +11,7 @@ Android SDK提供给集成Android原生客户端开发的开发者使用。
 开发目标|4.0以上	
 开发环境|Android Studio 2.1.3
 系统依赖|`v7包`
+产品依赖|`test-Button`|
 sdk三方依赖|无	
 
 # 安装
@@ -77,7 +78,7 @@ compile(name: 'geetest_onepass_android_v1.x.y', ext: 'aar')
 在项目的具体页面的`onCreate`方法里面进行初始化。
 	
 ```java
-gopGeetestUtils = GopGeetestUtils.getInstance(MainActivity.this);
+gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
 
 ``` 
 
@@ -97,19 +98,19 @@ gopGeetestUtils.getOnePass( editText.getText().toString(),validate,CUSTOM_ID,gop
 实现接口进行校验。
 
 ```java
-BaseGopListener gopLinster=new BaseGopListener() {
+BaseGOPListener gopLinster=new BaseGOPListener() {
 	@Override
-	public void gopErrorMessage(String error) {
+	public void gopOnError(String error) {
 		//过程中出现的错误
 	}
 
 	@Override
-	public void gopSendMsg(boolean canSendMSG，Map<String, String> result) {
+	public void gopOnSendMsg(boolean success，Map<String, String> result) {
 		//sdk内部发送短信所需要的结果，当为true的时候表示sdk内部发送短信，false的时候自定义短信
 	}
 
 	@Override
-	public void gopResult(Map<String, String> result) {
+	public void gopOnResult(Map<String, String> result) {
 		//网关校验拿到的结果，自定义进行校验
 	}
 };
@@ -117,7 +118,7 @@ BaseGopListener gopLinster=new BaseGopListener() {
 额外接口实现。
 
 ```java
-   gopGateWay();此接口用于未收到短信，进行再次请求时调用，默认为false
+   gopOnDobble();此接口用于未收到短信，进行再次请求时调用。
    
 ``` 
 ### 页面关闭
@@ -143,7 +144,7 @@ protected void onDestroy() {
 
 	
 ```
-public GopGeetestUtils(Context context)
+public GOPGeetestUtils(Context context)
 ```
 
 ### 参数说明
@@ -192,7 +193,7 @@ checkMessageUrl：onepass校验接口，网站主使用onepass的服务端sdk搭
 整个流程出现错误的时候调用
 	
 ```
-public gopErrorMessage(String error)
+public gopOnError(String error)
 
 ```
 
@@ -209,7 +210,7 @@ error | String |错误码|
 整个流程网关成功之后调用
 	
 ```
-public gopResult(Map<String,String> result)
+public gopOnResult(Map<String,String> result)
 
 ```
 
@@ -242,7 +243,7 @@ result|int|当等于0的时候表示成功，2的时候表示需要提交费用�
 整个流程进行发送短信调用
 	
 ```
-public gopSendMsg(boolean data，Map<String,String> result)
+public gopOnSendMsg(boolean data，Map<String,String> result)
 
 ```
 
@@ -291,7 +292,11 @@ gopGeetestUtils.cancelUtils()
 
 error	|说明| 			
 ------	|-----|
+`231`|网络未连接|
 `235`|服务请求出错|
+`242`|validate为null|
+`243`|customID为null|
+`245`|phone为null|
 
 
 	

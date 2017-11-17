@@ -13,9 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.geetest.onepass.GOPGeetestUtils;
+import com.geetest.onepass.GOPHttpUtils;
 
-import com.geetest.onepass.GopGeetestUtils;
-import com.geetest.onepass.GopHttpUtils;
 
 
 
@@ -111,7 +111,7 @@ public class SendMessageActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            return GopHttpUtils.submitPostData2(GTM_CHECK_MSG, mapcheck, "utf-8");
+            return GOPHttpUtils.submitPostData2(GTM_CHECK_MSG, mapcheck, "utf-8");
         }
 
         @Override
@@ -122,11 +122,11 @@ public class SendMessageActivity extends AppCompatActivity {
                 try {
                     JSONObject jsonObject = new JSONObject(params);
                     int result = jsonObject.getInt("result");
-                    if (result == GopGeetestUtils.GOP_RESULT_SUCCESS) {
+                    if (result == GOPGeetestUtils.GOP_RESULT_SUCCESS) {
                         //验证成功，进行页面跳转
                         toastUtil("success");
                         startActivity(new Intent(getApplicationContext(), SuccessActivity.class));
-                    } else if (result == GopGeetestUtils.GOP_RESULT_ARREARS) {
+                    } else if (result == GOPGeetestUtils.GOP_RESULT_ARREARS) {
                         toastUtil("您已经欠费");
                     } else {
                         toastUtil("验证失败");
