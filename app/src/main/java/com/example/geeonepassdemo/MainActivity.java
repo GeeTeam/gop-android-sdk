@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
                 gt3GeetestUtils.cancelAllTask();
+
                 toastUtil(s);
             }
 
