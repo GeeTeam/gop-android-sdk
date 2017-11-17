@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 初始化testbutton
+     * 初始化testbutton,此处为验证码的demo，如果需要，请自行申请验证码
      */
     private void initGT3() {
         gt3GeetestUtils = GT3GeetestUtils.getInstance(MainActivity.this);
@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * onepass的方法
+     * onepass的方法，执行onepass只需拿到验证码的validate，兼容所有公版验证码
      *
      * @param validate
      */
