@@ -43,16 +43,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-
+    /**
+     * 控件
+     */
     private EditText editText;
     private Button button;
     private TextView textView;
     private ImageView imageView;
 
     /**
-     * geetest的工具类
+     * onepass的工具类
      */
     private GOPGeetestUtils gopGeetestUtils;
+    /**
+     * testbutton的工具类
+     */
     private GT3GeetestUtils gt3GeetestUtils;
     /**
      * 服务器配置的verifyUrl接口
@@ -131,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                     /**
                      * 拿到验证码的validate
                      */
-                    openOnePass(jsonObject.getString("geetest_challenge"));
+                    openOnePass(jsonObject.getString("geetest_validate"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -314,7 +319,6 @@ public class MainActivity extends AppCompatActivity {
                 //结果异常则发送短信
                 gopGeetestUtils.sendMsg();
             } else {
-                Log.i("TTTTTTT", params);
                 try {
                     JSONObject jsonObject = new JSONObject(params);
                     int result = jsonObject.getInt("result");

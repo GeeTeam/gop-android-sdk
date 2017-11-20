@@ -288,15 +288,41 @@ public void cancelUtils()
 gopGeetestUtils.cancelUtils()
 ```	
 
-# 常用错误码
+## ErrorCode
 
-error	|说明| 			
-------	|-----|
-`231`|网络未连接|
-`235`|服务请求出错|
-`242`|validate为null|
-`243`|customID为null|
-`245`|phone为null|
+### OnePass
+
+`OnePass`产品的错误代码
+
+ErrorCode	|Description
+----------|------------
+231       |网络未连接
+235       |sendmessage接口返回为null
+236       |sendmessage接口错误
+238       |账号需充值
+239       |pregateway接口返回为null
+240       |pregateway接口错误
+242       |validate为null
+243       |customID为null
+245       |phone为null
+
+### test-Button
+
+`test-Button`产品的错误代码
+
+ErrorCode	|Description
+----------|------------
+200			|ajax请求被forbidden
+201 		|全局网络请求超时
+202			|验证码停用
+204			|webview加载出现的错误
+205			|api1接口返回为null
+206			|gettype接口返回为null
+207		    |getphp接口返回为null
+208			|ajax接口返回返回为null
+209			|api2接口返回返回为null
+
+
 
 
 	
