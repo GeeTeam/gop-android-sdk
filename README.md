@@ -288,6 +288,19 @@ public void cancelUtils()
 gopGeetestUtils.cancelUtils()
 ```	
 
+## 混淆规则
+
+```
+-dontwarn com.geetest.onepass.**
+-keep class com.geetest.onepass.** {
+*;
+}
+-dontwarn com.geetest.sdk.**
+-keep class com.geetest.sdk.** {
+*;
+}
+```
+
 ## ErrorCode
 
 ### OnePass
