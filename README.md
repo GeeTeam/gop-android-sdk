@@ -87,7 +87,7 @@ gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
 ```java
 gopGeetestUtils.getOnePass( editText.getText().toString(),validate,CUSTOM_ID,gopLinster);
 //第一个参数为输入的手机号码
-//第二个参数为验证的validate(当为null时,表示只需要onepass)
+//第二个参数为验证的validate
 //第三个参数为所需要配置的CUSTOM_ID
 //第四个参数为所需接口
 
@@ -168,7 +168,7 @@ public void getOnePass(String phone,String validate,String customID,BaseGopListe
 参数	|类型 |说明| 			
 ------	|-----|-----|
 phone|String|用户所填的手机号|
-validate|String|接口返回的validate,可以为null,当为null时,表示只需要onepass,|
+validate|String|接口返回的validate|
 customID|String|产品id|
 gopListener| BaseGopListener|回调监听器，需要开发者自己实现|
 

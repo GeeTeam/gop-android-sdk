@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
     private void openOnePass(String validate) {
         /**
          *    第一参数为填写的手机号
-         *    第二个参数为验证后的validate  当然也可以传null,传null表示只需要onepass
+         *    第二个参数为验证后的validate
          *    第三个参数为customid
          *    第四个参数为回调
          */
