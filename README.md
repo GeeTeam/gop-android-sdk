@@ -259,6 +259,8 @@ key	|说明|
 `custom`|产品id|
 `process_id`|流水号|
 `phone`|手机号|
+`message_id` |发送短信的id|
+`message_number`|短信验证码|
 
 #### checkMessageUrl的请求结果说明
 

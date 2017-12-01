@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean gtSetIsCustom() {
+            public boolean gt3SetIsCustom() {
                 /**
                  * 返回true表示自定义api2
                  */

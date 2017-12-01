@@ -29,7 +29,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile(name: 'geetest_onepass_android_v1.2.7', ext: 'aar')
-    compile(name: 'geetest_testbutton_android_v3.3.1', ext: 'aar')
+    compile(name: 'geetest_testbutton_android_v3.3.2', ext: 'aar')
 
 
 }
