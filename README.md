@@ -118,7 +118,8 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 额外接口实现。
 
 ```java
-   gopOnDobble();此接口用于未收到短信，进行再次请求时调用。
+   gopOnDobble();此接口用于未收到短信，进行再次请求时调用,默认为false。
+   gopOnDefaultSwitch();此接口用于判断是否调用本sdk内置短信,默认为false。
    
 ``` 
 ### 页面关闭
@@ -293,10 +294,6 @@ gopGeetestUtils.cancelUtils()
 ```
 -dontwarn com.geetest.onepass.**
 -keep class com.geetest.onepass.** {
-*;
-}
--dontwarn com.geetest.sdk.**
--keep class com.geetest.sdk.** {
 *;
 }
 ```
