@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private GT3GeetestListener gt3GeetestListener;
     /**
-     * 服务器配置的verifyUrl接口(testButton中的api1)
+     * 服务器配置的verifyUrl接口
      */
     public static final String GTM_GATEWAY = "https://onepass.geetest.com/check_gateway.php";
     /**
-     * 服务器配置的configUrl接口,格式为{"success": 1,"challenge": "85b5d5a9e255c32a37fd3a2d551983c6","gt": "019924a82c70bb123aae90d483087f94", "new_captcha": true}
+     * 服务器配置的configUrl接口,格式为{"success": 1,"challenge": "85b5d5a9e255c32a37fd3a2d551983c6","gt": "019924a82c70bb123aae90d483087f94", "new_captcha": true},(testButton中的api1)
      */
     private static final String CAPTCHA_URL = "http://www.geetest.com/demo/gt/register-test";
     /**
