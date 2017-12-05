@@ -8,17 +8,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.media.audiofx.BassBoost;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private GT3GeetestListener gt3GeetestListener;
     /**
-     * 服务器配置的verifyUrl接口
+     * 服务器配置的verifyUrl接口(testButton中的api1)
      */
     public static final String GTM_GATEWAY = "https://onepass.geetest.com/check_gateway.php";
     /**
@@ -252,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
                 toastUtil(s);
             }
 
+
             @Override
             public void gopOnResult(Map<String, String> map) {
                 /**
@@ -282,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
-
     /**
      * onepass的方法，执行onepass只需拿到验证码的validate，兼容所有公版验证码
      *
@@ -336,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String params) {
             if (TextUtils.isEmpty(params)) {
-                //结果异常则发送短信
+                //结果异常则发送短信,可以自定义短信
                 gopGeetestUtils.sendMsg();
             } else {
                 try {
@@ -353,11 +349,11 @@ public class MainActivity extends AppCompatActivity {
                     } else if (result == GOPGeetestUtils.GOP_RESULT_ARREARS) {
                         toastUtil("您已经欠费");
                     } else {
-                        //结果异常则发送短信
+                        //结果异常则发送短信,可以自定义短信
                         gopGeetestUtils.sendMsg();
                     }
                 } catch (Exception e) {
-                    //结果异常则发送短信
+                    //结果异常则发送短信,可以自定义短信
                     gopGeetestUtils.sendMsg();
                 }
             }
