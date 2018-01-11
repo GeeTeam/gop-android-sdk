@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 
 import com.geetest.onepass.GOPGeetestUtils;
-import com.geetest.onepass.GOPHttpUtils;
 
 
 
@@ -111,7 +110,7 @@ public class SendMessageActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            return GOPHttpUtils.submitPostData2(GTM_CHECK_MSG, mapcheck, "utf-8");
+            return GOPGeetestUtils.gopCheckMsg(GTM_CHECK_MSG, mapcheck, "utf-8");
         }
 
         @Override

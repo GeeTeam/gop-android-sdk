@@ -16,6 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +27,6 @@ import android.widget.Toast;
 
 import com.geetest.onepass.BaseGOPListener;
 import com.geetest.onepass.GOPGeetestUtils;
-import com.geetest.onepass.GOPHttpUtils;
 
 import com.geetest.sdk.GT3GeetestListener;
 import com.geetest.sdk.GT3GeetestUtils;
@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
     /**
      * 控件
      */
@@ -69,24 +70,19 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 服务器配置的verifyUrl接口
      */
-    public static final String GTM_GATEWAY = "https://onepass.geetest.com/check_gateway.php";
+    public static final String GOP_VERIFYURL = "https://onepass.geetest.com/check_gateway.php";
     /**
      * 服务器配置的testButton中的api1接口,格式为{"success": 1,"challenge": "85b5d5a9e255c32a37fd3a2d551983c6","gt": "019924a82c70bb123aae90d483087f94", "new_captcha": true}
      */
-    private static final String CAPTCHA_URL = "http://www.geetest.com/demo/gt/register-test";
+    private static final String CAPTCHA_URL = "http://www.geetest.com/demo/gt/register-fullpage";
     /**
      * 配置的customid
      */
-    private static final String CUSTOM_ID = "";
+    private static final String CUSTOM_ID = "fd2cf5e6589a7ceccbc1cc57f6b299a4";
     /**
      * 进度条
      */
     private ProgressDialog progressDialog;
-
-    /**
-     * 新map保存结果用于校验结果
-     */
-    private Map<String, String> getMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,18 +244,33 @@ public class MainActivity extends AppCompatActivity {
                 toastUtil(s);
             }
 
-
             @Override
-            public void gopOnResult(Map<String, String> map) {
+            public void gopOnResult(String result) {
                 /**
                  * 发送参数进行校验
                  */
-                getMap = map;
-                new GtmNewTask().execute();
+                Log.i(TAG, result);
+                Intent intent = new Intent(getApplicationContext(), SuccessActivity.class);
+                startActivity(intent);
             }
 
             @Override
-            public void gopOnSendMsg(boolean b, Map<String, String> map) {
+            public int gopOnAnalysisVerifyUrl(JSONObject jsonObject) {
+                Log.i(TAG, jsonObject.toString());
+                return super.gopOnAnalysisVerifyUrl(jsonObject);
+            }
+
+            @Override
+            public String gopOnVerifyUrl() {
+                return GOP_VERIFYURL;
+            }
+
+            @Override
+            public void gopOnSendMsg(boolean b, Map<String, String> map, JSONObject jsonObject) {
+                /**
+                 * 发短信原因
+                 */
+                Log.i(TAG, jsonObject.toString());
                 /**
                  * 短信分发接口
                  */
@@ -279,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
+
     /**
      * onepass的方法，执行onepass只需拿到验证码的validate，兼容所有公版验证码
      *
@@ -317,51 +329,6 @@ public class MainActivity extends AppCompatActivity {
         return mobileDataEnabled;
     }
 
-
-    /**
-     * 自定义请求
-     */
-    private class GtmNewTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            //网络请求需要自己写
-            return GOPHttpUtils.submitPostData2(GTM_GATEWAY, getMap, "utf-8");
-        }
-
-        @Override
-        protected void onPostExecute(String params) {
-            if (TextUtils.isEmpty(params)) {
-                //结果异常则发送短信,可以自定义短信
-                gopGeetestUtils.sendMsg();
-            } else {
-                try {
-                    JSONObject jsonObject = new JSONObject(params);
-                    int result = jsonObject.getInt("result");
-                    if (result == GOPGeetestUtils.GOP_RESULT_SUCCESS) {
-                        //验证成功，进入验证成功页面
-                        toastUtil("success");
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                        }
-
-                        startActivity(new Intent(getApplicationContext(), SuccessActivity.class));
-                    } else if (result == GOPGeetestUtils.GOP_RESULT_ARREARS) {
-                        toastUtil("您已经欠费");
-                    } else {
-                        //结果异常则发送短信,可以自定义短信
-                        gopGeetestUtils.sendMsg();
-                    }
-                } catch (Exception e) {
-                    //结果异常则发送短信,可以自定义短信
-                    gopGeetestUtils.sendMsg();
-                }
-            }
-
-        }
-
-    }
-
     /**
      * 判断手机号合法性
      *
@@ -369,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     public boolean chargePhoneNum(String phoneNumber) {
-        String regExp = "^((13[0-9])|(15[^4])|(18[0-9])|(17[0-8])|(14[5-9])|(19[8,9])|)\\d{8}$";
+        String regExp = "^((13[0-9])|(15[^4])|(18[0-9])|(17[0-8])|(14[5-9])|(166)|(19[8,9])|)\\d{8}$";
         Pattern p = Pattern.compile(regExp);
         Matcher m = p.matcher(phoneNumber);
         return m.matches();

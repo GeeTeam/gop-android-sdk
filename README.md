@@ -105,14 +105,20 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 	}
 
 	@Override
-	public void gopOnSendMsg(boolean success，Map<String, String> result) {
+	public void gopOnSendMsg(boolean success,Map<String, String> result, JSONObject jsonObject) {
 		//sdk内部发送短信所需要的结果，当为true的时候表示sdk内部发送短信，false的时候自定义短信
 	}
 
 	@Override
-	public void gopOnResult(Map<String, String> result) {
-		//网关校验拿到的结果，自定义进行校验
+	public void gopOnResult(String result) {
+		//校验成功,返回校验成功数据
 	}
+
+	@Override
+    public String gopOnVerifyUrl() {
+        //返回服务器配置接口
+          return GOP_VERIFYURL;
+       }
 };
 ``` 
 额外接口实现。
@@ -120,7 +126,10 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 ```java
    gopOnDobble();此接口用于未收到短信，进行再次请求时调用,默认为false。
    gopOnDefaultSwitch();此接口用于判断是否调用本sdk内置短信,默认为false。
-   
+   gopOnVerifyUrlBody();此接口用于向verifyUrl的接口body中传参,默认为null。
+   gopOnAnalysisVerifyUrl();此接口用于拿到校验的接口返回的参数,并获取返回值回传给sdk。
+   gopOnEncryption();方法用于加密手机号,支持SHA256。
+
 ``` 
 ### 页面关闭
 
@@ -202,14 +211,14 @@ public gopOnError(String error)
 ------	|-----|-----|
 error | String |错误码|	
 
-### 处理网关参数回调
+### 网关成功回调
 
 #### 方法说明
 
 整个流程网关成功之后调用
 	
 ```
-public gopOnResult(Map<String,String> result)
+public gopOnResult(String result)
 
 ```
 
@@ -217,23 +226,18 @@ public gopOnResult(Map<String,String> result)
 
 参数	|类型 |说明| 			
 ------	|-----|-----|
-result | Map |verifyUrl的请求参数|
+result | String |verifyUrl的验证成功的结果|
 
-#### verifyUrl的请求参数说明
+### verifyUrl传入回调
 
-key	|说明| 			
-------	|-----|
-`custom`|产品id|
-`process_id`|流水号|
-`phone`|手机号|
-`accesscode`|网关token，从运营商获取|
-`clienttype`|系统类型，1表示为Android|
+#### 方法说明
 
-#### verifyUrl的请求结果说明
+回传verifyUrl
 
-参数	|类型|说明| 			
-------	|---|-----|
-result|int|当等于0的时候表示成功，2的时候表示需要提交费用，其他表示验证手机号失败|
+```
+public String gopOnVerifyUrl()
+
+```
 
 ### 处理短信参数回调
 
@@ -242,7 +246,7 @@ result|int|当等于0的时候表示成功，2的时候表示需要提交费用�
 整个流程进行发送短信调用
 	
 ```
-public gopOnSendMsg(boolean data，Map<String,String> result)
+public gopOnSendMsg(boolean data，Map<String,String> result, JSONObject jsonObject)
 
 ```
 
@@ -252,6 +256,7 @@ public gopOnSendMsg(boolean data，Map<String,String> result)
 ------	|-----|-----|
 data|boolean|客户所选择的短信发送业务，如果为false，则自定义短信发送，如果为true，则表示短信业务由onepass sdk内部发送|
 result | Map |checkMessageUrl的请求参数|
+jsonObject|JSONObject|发送短信的原因|
 
 #### checkMessageUrl的请求参数说明
 

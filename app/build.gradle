@@ -25,11 +25,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile(name: 'geetest_onepass_android_v1.2.8', ext: 'aar')
+    compile(name: 'geetest_onepass_android_v1.3.4', ext: 'aar')
     compile(name: 'geetest_testbutton_android_v3.3.2', ext: 'aar')
-
 
 }
