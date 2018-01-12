@@ -128,7 +128,6 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
    gopOnDefaultSwitch();此接口用于判断是否调用本sdk内置短信,默认为false。
    gopOnVerifyUrlBody();此接口用于向verifyUrl的接口body中传参,默认为null。
    gopOnAnalysisVerifyUrl();此接口用于拿到校验的接口返回的参数,并获取返回值回传给sdk。
-   gopOnEncryption();方法用于加密手机号,支持SHA256。
 
 ``` 
 ### 页面关闭
@@ -313,7 +312,7 @@ ErrorCode	|Description
 ----------|------------
 231       |网络未连接
 235       |sendmessage接口返回为null
-236       |sendmessage接口错误
+237       |sendmessage接口错误
 238       |账号需充值
 239       |pregateway接口返回为null
 240       |pregateway接口错误

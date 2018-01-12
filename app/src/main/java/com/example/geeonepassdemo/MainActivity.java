@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private Button button;
     private TextView textView;
     private ImageView imageView;
-
     /**
      * onepass的工具类
      */
@@ -74,11 +73,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 服务器配置的testButton中的api1接口,格式为{"success": 1,"challenge": "85b5d5a9e255c32a37fd3a2d551983c6","gt": "019924a82c70bb123aae90d483087f94", "new_captcha": true}
      */
-    private static final String CAPTCHA_URL = "http://www.geetest.com/demo/gt/register-fullpage";
+    private static final String CAPTCHA_URL = "http://www.geetest.com/demo/gt/register-test";
     /**
      * 配置的customid
      */
-    private static final String CUSTOM_ID = "fd2cf5e6589a7ceccbc1cc57f6b299a4";
+    private static final String CUSTOM_ID = "";
     /**
      * 进度条
      */
@@ -187,6 +186,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void gt3DialogReady() {
+                /**
+                 * 验证码ready的时候所走的接口，一般用于关闭加载框
+                 */
                 if (progressDialog != null) {
                     progressDialog.dismiss();
                 }
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
     private void initGop() {
         gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
         /**
-         * 初始化onepass监听类
+         * 初始化onepass监听类(必须实现的有四个接口，处理流程中实现的问题)
          */
         baseGOPListener = new BaseGOPListener() {
             @Override
@@ -247,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void gopOnResult(String result) {
                 /**
-                 * 发送参数进行校验
+                 * 验证成功的回调
                  */
                 Log.i(TAG, result);
                 Intent intent = new Intent(getApplicationContext(), SuccessActivity.class);
@@ -256,19 +258,35 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public int gopOnAnalysisVerifyUrl(JSONObject jsonObject) {
+                /**
+                 * 返回VerifyUrl的请求结果，并拿到result值回传给sdk
+                 * 默认为：
+                 *  try {
+                 return var1.getInt("result");
+                 }    catch (JSONException var3) {
+                 var3.printStackTrace();
+                 return 0;
+                 }
+                 */
                 Log.i(TAG, jsonObject.toString());
                 return super.gopOnAnalysisVerifyUrl(jsonObject);
             }
 
             @Override
             public String gopOnVerifyUrl() {
+                /**
+                 * 回传给sdk内部使用的VerifyUrl(必填)
+                 */
                 return GOP_VERIFYURL;
             }
 
             @Override
             public void gopOnSendMsg(boolean b, Map<String, String> map, JSONObject jsonObject) {
                 /**
-                 * 发短信原因
+                 * 发短信原因（JSON形式）
+                 *
+                 * 数据格式为json
+                 * error_code与error
                  */
                 Log.i(TAG, jsonObject.toString());
                 /**

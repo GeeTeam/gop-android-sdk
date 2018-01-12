@@ -31,7 +31,7 @@ public class SendMessageActivity extends AppCompatActivity {
     /**
      * 服务器配置的checkMessageUrl的接口
      */
-    public static final String GTM_CHECK_MSG = "https://onepass.geetest.com/check_message.php";
+    public static final String GOP_CHECK_MSG = "https://onepass.geetest.com/check_message.php";
     private ImageView imageView;
     private CountDownTimer countDownTimer;
     /**
@@ -110,7 +110,7 @@ public class SendMessageActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            return GOPGeetestUtils.gopCheckMsg(GTM_CHECK_MSG, mapcheck, "utf-8");
+            return GOPGeetestUtils.gopCheckMsg(GOP_CHECK_MSG, mapcheck, "utf-8");
         }
 
         @Override
