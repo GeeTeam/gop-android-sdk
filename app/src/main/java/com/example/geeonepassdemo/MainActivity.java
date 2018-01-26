@@ -25,11 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.geetest.gt3unbindsdk.Bind.GT3GeetestBindListener;
+import com.geetest.gt3unbindsdk.Bind.GT3GeetestUtilsBind;
 import com.geetest.onepass.BaseGOPListener;
 import com.geetest.onepass.GOPGeetestUtils;
-
-import com.geetest.sdk.GT3GeetestListener;
-import com.geetest.sdk.GT3GeetestUtils;
 
 
 import org.json.JSONException;
@@ -61,11 +60,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * testbutton的工具类
      */
-    private GT3GeetestUtils gt3GeetestUtils;
+    private GT3GeetestUtilsBind gt3GeetestUtils;
     /**
      * testbutton监听类
      */
-    private GT3GeetestListener gt3GeetestListener;
+    private GT3GeetestBindListener gt3GeetestListener;
     /**
      * 服务器配置的verifyUrl接口
      */
@@ -138,20 +137,18 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                progressDialog = ProgressDialog.show(MainActivity.this, null, "验证加载中", true, true);
                                 /**
                                  * testbutton开启
                                  */
-                                gt3GeetestUtils.getGeetest(MainActivity.this, CAPTCHA_URL, null, gt3GeetestListener);
+                                gt3GeetestUtils.getGeetest(MainActivity.this, CAPTCHA_URL, null, null, gt3GeetestListener);
                             }
                         });
                         builder.create().show();
                     } else {
-                        progressDialog = ProgressDialog.show(MainActivity.this, null, "验证加载中", true, true);
                         /**
                          * testbutton开启
                          */
-                        gt3GeetestUtils.getGeetest(MainActivity.this, CAPTCHA_URL, null, gt3GeetestListener);
+                        gt3GeetestUtils.getGeetest(MainActivity.this, CAPTCHA_URL, null, null, gt3GeetestListener);
                     }
 
                 } else {
@@ -167,31 +164,17 @@ public class MainActivity extends AppCompatActivity {
      * 初始化testbutton,此处为验证码的demo，如果需要，请自行申请验证码
      */
     private void initGT3() {
-        gt3GeetestUtils = GT3GeetestUtils.getInstance(MainActivity.this);
+        gt3GeetestUtils = new GT3GeetestUtilsBind(MainActivity.this);
         /**
          * 初始化textbutton监听类
          */
-        gt3GeetestListener = new GT3GeetestListener() {
+        gt3GeetestListener = new GT3GeetestBindListener() {
             @Override
             public void gt3DialogOnError(String s) {
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
                 /**
                  * 方法为调用之后后续流程不会走，为报错的时候所走的方法
                  */
                 gt3GeetestUtils.cancelAllTask();
-                toastUtil(s);
-            }
-
-            @Override
-            public void gt3DialogReady() {
-                /**
-                 * 验证码ready的时候所走的接口，一般用于关闭加载框
-                 */
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
             }
 
             @Override
@@ -209,9 +192,9 @@ public class MainActivity extends AppCompatActivity {
                  *
                  * 然后在完成之后进行自定义loading的再次触发
                  */
-                if (progressDialog != null) {
-                    progressDialog.dismiss();
-                }
+                gt3GeetestUtils.gt3Dismiss();
+                progressDialog = ProgressDialog.show(MainActivity.this, null, "验证加载中", true, true);
+
                 try {
                     JSONObject jsonObject = new JSONObject(s);
                     /**
@@ -251,6 +234,9 @@ public class MainActivity extends AppCompatActivity {
                 /**
                  * 验证成功的回调
                  */
+                if (progressDialog != null) {
+                    progressDialog.dismiss();
+                }
                 Log.i(TAG, result);
                 Intent intent = new Intent(getApplicationContext(), SuccessActivity.class);
                 startActivity(intent);
