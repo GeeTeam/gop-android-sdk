@@ -2,7 +2,7 @@
 
 # 概述与资源
 
-Android SDK提供给集成Android原生客户端开发的开发者使用。
+Android SDK提供给集成Android原生客户端开发的开发者使用。集成的时候需要使用[test_Button的最新版本](https://github.com/GeeTeam/gt3-android-sdk)。
 
 ## 环境需求
 
