@@ -115,7 +115,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 	}
 
 	@Override
-    public String gopOnVerifyUrl() {
+        public String gopOnVerifyUrl() {
         //返回服务器配置接口
           return GOP_VERIFYURL;
        }
@@ -255,7 +255,7 @@ public gopOnSendMsg(boolean data，Map<String,String> result, JSONObject jsonObj
 ------	|-----|-----|
 data|boolean|客户所选择的短信发送业务，如果为false，则自定义短信发送，如果为true，则表示短信业务由onepass sdk内部发送|
 result | Map |checkMessageUrl的请求参数|
-jsonObject|JSONObject|发送短信的原因|
+jsonObject|JSONObject|发送短信的原因,有token fail和verify fail两种|
 
 #### checkMessageUrl的请求参数说明
 
@@ -319,6 +319,13 @@ ErrorCode	|Description
 242       |validate为null
 243       |customID为null
 245       |phone为null
+251       |Get CM token fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+252       |Get CU token fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+253       |Get CT token fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+254       |CM verify fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+255       |CU verify fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+256       |CT verify fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+261       |gopOnVerifyUrl接口未进行传值
 
 ### test-Button
 
