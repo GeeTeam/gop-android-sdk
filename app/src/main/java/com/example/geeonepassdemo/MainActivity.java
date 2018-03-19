@@ -24,10 +24,7 @@ import android.widget.Toast;
 
 import com.geetest.onepass.BaseGOPListener;
 import com.geetest.onepass.GOPGeetestUtils;
-import com.geetest.sdk.Bind.GT3GeetestBindListener;
-import com.geetest.sdk.Bind.GT3GeetestUtilsBind;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
@@ -54,21 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private BaseGOPListener baseGOPListener;
 
     /**
-     * testbutton的工具类
-     */
-    private GT3GeetestUtilsBind gt3GeetestUtils;
-    /**
-     * testbutton监听类
-     */
-    private GT3GeetestBindListener gt3GeetestListener;
-    /**
      * 服务器配置的verifyUrl接口
      */
     public static final String GOP_VERIFYURL = "https://onepass.geetest.com/check_gateway.php";
-    /**
-     * 服务器配置的testButton中的api1接口,格式为{"success": 1,"challenge": "85b5d5a9e255c32a37fd3a2d551983c6","gt": "019924a82c70bb123aae90d483087f94", "new_captcha": true}
-     */
-    private static final String CAPTCHA_URL = "http://www.geetest.com/demo/gt/register-test";
     /**
      * 配置的customid
      */
@@ -94,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             //TODO
         }
         init();
-        initGT3();
         initGop();
     }
 
@@ -133,18 +117,9 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                /**
-                                 * testbutton开启
-                                 */
-                                gt3GeetestUtils.getGeetest(MainActivity.this, CAPTCHA_URL, null, null, gt3GeetestListener);
                             }
                         });
                         builder.create().show();
-                    } else {
-                        /**
-                         * testbutton开启
-                         */
-                        gt3GeetestUtils.getGeetest(MainActivity.this, CAPTCHA_URL, null, null, gt3GeetestListener);
                     }
 
                 } else {
@@ -154,55 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    /**
-     * 初始化testbutton,此处为验证码的demo，如果需要，请自行申请验证码
-     */
-    private void initGT3() {
-        gt3GeetestUtils = new GT3GeetestUtilsBind(MainActivity.this);
-        /**
-         * 初始化textbutton监听类
-         */
-        gt3GeetestListener = new GT3GeetestBindListener() {
-            @Override
-            public void gt3DialogOnError(String s) {
-                /**
-                 * 方法为调用之后后续流程不会走，为报错的时候所走的方法
-                 */
-                gt3GeetestUtils.cancelAllTask();
-            }
-
-            @Override
-            public boolean gt3SetIsCustom() {
-                /**
-                 * 返回true表示自定义api2
-                 */
-                return true;
-            }
-
-            @Override
-            public void gt3GetDialogResult(boolean b, String s) {
-                /**
-                 * 拿到结果也要关闭一次，若是宕机模式会直接走这个接口
-                 *
-                 * 然后在完成之后进行自定义loading的再次触发
-                 */
-                gt3GeetestUtils.gt3Dismiss();
-                progressDialog = ProgressDialog.show(MainActivity.this, null, "验证加载中", true, true);
-
-                try {
-                    JSONObject jsonObject = new JSONObject(s);
-                    /**
-                     * 拿到验证码的validate
-                     */
-                    openOnePass(jsonObject.getString("geetest_validate"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-
     }
 
     /**
@@ -360,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
         }
         //销毁的时候执行
         gopGeetestUtils.cancelUtils();
-        gt3GeetestUtils.cancelUtils();
 
 
     }
