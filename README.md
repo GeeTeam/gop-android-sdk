@@ -2,7 +2,7 @@
 
 # 概述与资源
 
-Android SDK提供给集成Android原生客户端开发的开发者使用。集成的时候需要使用[test_Button的最新版本](https://github.com/GeeTeam/gt3-android-sdk)。
+Android SDK提供给集成Android原生客户端开发的开发者使用。
 
 ## 环境需求
 
@@ -11,7 +11,6 @@ Android SDK提供给集成Android原生客户端开发的开发者使用。集�
 开发目标|4.0以上	
 开发环境|Android Studio 2.1.3
 系统依赖|`v7包`
-产品依赖|`test-Button`|
 sdk三方依赖|无	
 
 # 安装
@@ -35,7 +34,7 @@ repositories {
 并且要手动将aar包添加依赖：
 
 ```java
-compile(name: 'geetest_onepass_android_v1.x.y', ext: 'aar')
+compile(name: 'geetest_onepass_android_vx.y.z', ext: 'aar')
 
 ``` 
 
@@ -54,7 +53,7 @@ compile(name: 'geetest_onepass_android_v1.x.y', ext: 'aar')
 
 ## 配置接口
 
-开发者集成客户端sdk前, 必须先在您的服务器上搭建相应的**服务端SDK**。
+开发者集成客户端sdk前, 必须先在您的服务器上搭建相应的**服务端SDK**，生成二次验证的接口即下文的**verifyUrl**。
 
 集成用户需要使用Android SDK完成提供的以下接口:
 
@@ -87,7 +86,7 @@ gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
 ```java
 gopGeetestUtils.getOnePass( editText.getText().toString(),validate,CUSTOM_ID,gopLinster);
 //第一个参数为输入的手机号码
-//第二个参数为验证的validate
+//第二个参数为接入验证码SDK返回的validate(如果只接入onepass则传null)
 //第三个参数为所需要配置的CUSTOM_ID
 //第四个参数为所需接口
 
@@ -115,20 +114,57 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 	}
 
 	@Override
-        public String gopOnVerifyUrl() {
-        //返回服务器配置接口
-          return GOP_VERIFYURL;
-       }
+    public String gopOnVerifyUrl() {
+    	//接入服务端SDK生成二次验证接口接口,
+    	return GOP_VERIFYURL;
+    }
 };
+
+	@Override
+    public Map<String, String> gopOnVerifyUrlBody() {
+        // verifyUrl接口传入form数据对象
+        HashMap<String, String> map = new HashMap<>();
+        // map.put("test","test");
+        return null;
+    }
+
+	@Override
+    public Map<String, String> gopOnVerifyUrlJsonBody() {
+    	// verifyUrl接口传入json数据对象
+    	HashMap<String, String> map = new HashMap<>();
+    	// map.put("test","test");
+    	return null;
+    }
+
+    @Override
+    public Map<String, String> gopOnVerifyUrlHeaders() {
+        // verifyUrl接口传入header对象
+        HashMap<String, String> map = new HashMap<>();
+        // map.put("Content-Type","application/json;charset=UTF-8");
+        map.put("Content-Type", "application/x-www-form-urlencoded");
+        return null;
+    }
 ``` 
 额外接口实现。
 
 ```java
    gopOnDobble();此接口用于未收到短信，进行再次请求时调用,默认为false。
    gopOnDefaultSwitch();此接口用于判断是否调用本sdk内置短信,默认为false。
+   gopOnVerifyUrlHeaders;此接口用于向verifyUrl接口传递header，默认为null。
    gopOnVerifyUrlBody();此接口用于向verifyUrl的接口body中传参,默认为null。
+   gopOnVerifyUrlJsonBody;此接口用于向verifyUrl的接口body传参，提供，默认为null。
    gopOnAnalysisVerifyUrl();此接口用于拿到校验的接口返回的参数,并获取返回值回传给sdk。
 
+``` 
+``` 
+注意：verifyUrl接口只支持post，兼容form和json数据格式上行数据。
+
+Form：重写gopOnVerifyBody方法，返回上行body参数。如果没有参数则返回为null或者未put数据的map，注意gopOnVerifyUrlJsonBody方法返回未null或者不重写
+Json：重写gopOnVerifyUrlJsonBody方法，返回上行body参数，如果没有需要传输参数则返回未put数据的map。注意此时gopOnVerifyBody方法返回null或者不重写
+
+默认上行body参数包括phone，process_id，accesscode，custom等，不得在gopOnVerifyUrlBody和gopOnVerifyUrlJsonBody方法重复传入
+
+gopOnVerifyUrlHeaders方法传入verifyUrl接口需要的header参数
 ``` 
 ### 页面关闭
 
@@ -177,7 +213,7 @@ public void getOnePass(String phone,String validate,String customID,BaseGopListe
 参数	|类型 |说明| 			
 ------	|-----|-----|
 phone|String|用户所填的手机号|
-validate|String|接口返回的validate|
+validate|String|验证码SDK返回的validate，如果未接验证码则为null|
 customID|String|产品id|
 gopListener| BaseGopListener|回调监听器，需要开发者自己实现|
 
@@ -187,11 +223,6 @@ gopListener| BaseGopListener|回调监听器，需要开发者自己实现|
 gopGeetestUtils.getOnePass(phone,validate，customid,gopListener)
 ```
 
-## 回调监听
-
-verifyUrl：onepass校验接口，网站主使用onepass的服务端sdk搭建
-
-checkMessageUrl：onepass校验接口，网站主使用onepass的服务端sdk搭建
 
 ### 错误回调
 
@@ -292,12 +323,32 @@ public void cancelUtils()
 ```
 gopGeetestUtils.cancelUtils()
 ```	
+### 方法描述 
+获取SDK版本号
+
+```
+public void getVersion()
+```
+
+### 参数说明
+
+无
+
+### 代码示例
+
+```
+gopGeetestUtils.getVersion()
+```	
 
 ## 混淆规则
 
 ```
 -dontwarn com.geetest.onepass.**
+-dontwarn com.geetest.encryption.**
 -keep class com.geetest.onepass.** {
+*;
+}
+-keep class com.geetest.encryption.** {
 *;
 }
 ```
@@ -319,29 +370,24 @@ ErrorCode	|Description
 242       |validate为null
 243       |customID为null
 245       |phone为null
-251       |Get CM token fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
-252       |Get CU token fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
-253       |Get CT token fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
-254       |CM verify fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
-255       |CU verify fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
-256       |CT verify fail(为gopOnSendMsg接口内部所有,是用于标记发短信的原因)
+251       |Get CM token fail(获取移动token失败)
+252       |Get CU token fail(获取联通token失败)
+253       |Get CT token fail(获取电信token失败)
+254       |CM verify fail(移动verifyUrl接口验证失败)
+255       |CU verify fail(联通verifyUrl接口验证失败)
+256       |CT verify fail(电信verifyUrl接口验证失败)
 261       |gopOnVerifyUrl接口未进行传值
 
-### test-Button
+##常见错误
+###1.总是报251，或者252，或者253错误？
+答：第一步：检查手机是否停机；第二步：若总是报251错误，检查测试apk的签名是否与在极验后台设置签名一致。总是报252错误请联系我们。总是报253错误请检查是否是2、3G网络联网（电信不支持2、3G网络进行网关验证）。
+###2.总是报240错误？
+答：检查customId或者validate是否正确配置。
+###3.总是报254，或者255，或者256错误？
+答：第一步：检查是否是本机号验证，检查是否是验证的手机号开启网络，确认是否是真机测试，确认verifyUrl接口为Post接口；第二步：检查verifyUrl接口是否配置正确（TAG为Geetest_GOP的Log可以看到是否成功）；第三步：打印gopOnAnalysisVerifyUrl回调的值，如果为0则成功，如果为1则失败，如果失败说明客户自己服务端接入失败，请客户服务端排查问题；第四步：如果gopOnAnalysisVerifyUrl未回调日志请参考demo打印日志。
 
-`test-Button`产品的错误代码
 
-ErrorCode	|Description
-----------|------------
-200			|ajax请求被forbidden
-201 		|全局网络请求超时
-202			|验证码停用
-204			|webview加载出现的错误
-205			|api1接口返回为null
-206			|gettype接口返回为null
-207		    |getphp接口返回为null
-208			|ajax接口返回返回为null
-209			|api2接口返回返回为null
+
 
 
 

@@ -28,6 +28,7 @@ import com.geetest.onepass.GOPGeetestUtils;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -117,15 +118,19 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
+                                // 如果只接入onepass传入null,否则传入验证码返回的validate
+                                openOnePass(null);
                             }
                         });
                         builder.create().show();
+                    }else {
+                        // 如果只接入onepass传入null,否则传入验证码返回的validate
+                        openOnePass(null);
                     }
 
                 } else {
                     textView.setVisibility(View.VISIBLE);
                     editText.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
-
                 }
             }
         });
@@ -176,16 +181,45 @@ public class MainActivity extends AppCompatActivity {
                  return 0;
                  }
                  */
-                Log.i(TAG, jsonObject.toString());
+                try {
+                    Log.i(TAG, jsonObject.toString());
+                }catch (Exception e){
+                    Log.i(TAG, e.toString());
+                }
                 return super.gopOnAnalysisVerifyUrl(jsonObject);
             }
 
             @Override
             public String gopOnVerifyUrl() {
                 /**
-                 * 回传给sdk内部使用的VerifyUrl(必填)
+                 * 回传给sdk内部使用的VerifyUrl(必填),具体参考服务端接入文档
                  */
                 return GOP_VERIFYURL;
+            }
+
+            @Override
+            public Map<String, String> gopOnVerifyUrlHeaders() {
+                // verifyUrl接口传入header对象
+                HashMap<String, String> map = new HashMap<>();
+                // map.put("Content-Type","application/json;charset=UTF-8");
+                map.put("Content-Type", "application/x-www-form-urlencoded");
+                return null;
+            }
+
+            @Override
+            public Map<String, String> gopOnVerifyUrlBody() {
+                // verifyUrl接口传入form数据对象,如果没有需要传入的数据可以返回为null，注意gopOnVerifyUrlJsonBody返回为null
+                HashMap<String, String> map = new HashMap<>();
+                // map.put("test","test");
+                return null;
+            }
+
+            @Override
+            public Map<String, String> gopOnVerifyUrlJsonBody() {
+                // verifyUrl接口传入json数据对象，如果没有需要传入数据返回一个未put数据map，注意gopOnVerifyUrlBody返回为null
+                HashMap<String, String> map = new HashMap<>();
+                // map.put("test","test");
+                return null;
             }
 
             @Override
