@@ -150,7 +150,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 ```java
    gopOnDobble();此接口用于未收到短信，进行再次请求时调用,默认为false。
    gopOnDefaultSwitch();此接口用于判断是否调用本sdk内置短信,默认为false。
-   gopOnVerifyUrlHeaders;此接口用于向verifyUrl接口传递header，默认为null。
+   gopOnVerifyUrlHeaders;此接口用于向verifyUrl接口传递header,默认为null。
    gopOnVerifyUrlBody();此接口用于向verifyUrl的接口body中传参,默认为null。
    gopOnVerifyUrlJsonBody;此接口用于向verifyUrl的接口body传参，提供，默认为null。
    gopOnAnalysisVerifyUrl();此接口用于拿到校验的接口返回的参数,并获取返回值回传给sdk。
@@ -352,6 +352,9 @@ gopGeetestUtils.getVersion()
 *;
 }
 ```
+## 日志打印
+
+SDK提供部分日志，TAG为Geetest_GOP。
 
 ## ErrorCode
 
@@ -378,19 +381,20 @@ ErrorCode	|Description
 256       |CT verify fail(电信verifyUrl接口验证失败)
 261       |gopOnVerifyUrl接口未进行传值
 
-##常见错误
+## 常见错误
 
-###1.总是报251，或者252，或者253错误？
+### 1.总是报251，或者252，或者253错误？
 
 答：第一步：检查手机是否停机；第二步：若总是报251错误，检查测试apk的签名是否与在极验后台设置签名一致。总是报252错误请联系我们。总是报253错误请检查是否是2、3G网络联网（电信不支持2、3G网络进行网关验证）。
 
-###2.总是报240错误？
+### 2.总是报240错误？
 
 答：检查customId或者validate是否正确配置。
 
-###3.总是报254，或者255，或者256错误？
+### 3.总是报254，或者255，或者256错误？
 
 答：第一步：检查是否是本机号验证，检查是否是验证的手机号开启网络，确认是否是真机测试，确认verifyUrl接口为Post接口；第二步：检查verifyUrl接口是否配置正确（TAG为Geetest_GOP的Log可以看到是否成功）；第三步：打印gopOnAnalysisVerifyUrl回调的值，如果为0则成功，如果为1则失败，如果失败说明客户自己服务端接入失败，请客户服务端排查问题；第四步：如果gopOnAnalysisVerifyUrl未回调日志请参考demo打印日志。
+
 
 
 
