@@ -2,13 +2,11 @@ package com.example.geeonepassdemo;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -27,11 +25,8 @@ import com.geetest.onepass.GOPGeetestUtils;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
@@ -43,16 +38,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView;
     private ImageView imageView;
     /**
-     * onepass的工具类
-     */
-    private GOPGeetestUtils gopGeetestUtils;
-    /**
      * onepass的监听类
      */
     private BaseGOPListener baseGOPListener;
 
     /**
-     * 服务器配置的verifyUrl接口
+     * 服务器配置的verifyUrl接口,简称checkgateway
      */
     public static final String GOP_VERIFYURL = "https://onepass.geetest.com/check_gateway.php";
     /**
@@ -73,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(new GTMTextUtils().getText());
         //拿到这个权限可以更方便的进行网关验证
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
         } else {
@@ -83,10 +73,21 @@ public class MainActivity extends AppCompatActivity {
         initGop();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        //TODO 必须调用，释放资源，销毁的时候执行
+        GOPGeetestUtils.getInstance().cancelUtils();
+    }
+
     /**
      * 初始化控件
      */
     private void init() {
+        progressDialog = new DemoProgress(this);
         editText = (EditText) findViewById(R.id.et);
         button = (Button) findViewById(R.id.btn);
         textView = (TextView) findViewById(R.id.gtm_check_num_tv);
@@ -101,10 +102,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //检测手机号格式
-                if (chargePhoneNum(editText.getText().toString())) {
+                if (Utils.chargePhoneNum(editText.getText().toString())) {
                     textView.setVisibility(View.INVISIBLE);
                     editText.getBackground().clearColorFilter();
-                    if (!haveIntent(MainActivity.this)) {
+                    if (!Utils.haveIntent(MainActivity.this)) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                         builder.setMessage("检测到未开启移动数据，建议手动开启进行操作");
                         builder.setTitle("提示");
@@ -137,10 +138,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * onepass的方法，执行onepass只需拿到验证码的validate，兼容所有公版验证码
+     *
+     * @param validate
+     */
+    private void openOnePass(String validate) {
+        progressDialog.show();
+        /**
+         *    第一参数为填写的手机号
+         *    第二个参数为验证后的validate
+         *    第三个参数为customid
+         *    第四个参数为回调
+         */
+        GOPGeetestUtils.getInstance().getOnePass(editText.getText().toString(), validate, CUSTOM_ID, baseGOPListener);
+    }
+
+    /**
      * 初始化onepass
      */
     private void initGop() {
-        gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
+        GOPGeetestUtils.getInstance().init(MainActivity.this);
         /**
          * 初始化onepass监听类(必须实现的有四个接口，处理流程中实现的问题)
          */
@@ -169,6 +186,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
 
+            /**
+             * 返回0为成功1为失败，int类型。可以重写此方法，自定义解析checkgateway返回值
+             * @param jsonObject
+             * @return
+             */
             @Override
             public int gopOnAnalysisVerifyUrl(JSONObject jsonObject) {
                 /**
@@ -178,15 +200,16 @@ public class MainActivity extends AppCompatActivity {
                  return var1.getInt("result");
                  }    catch (JSONException var3) {
                  var3.printStackTrace();
-                 return 0;
+                 return 1;
                  }
                  */
                 try {
                     Log.i(TAG, jsonObject.toString());
+                    return super.gopOnAnalysisVerifyUrl(jsonObject);
                 }catch (Exception e){
                     Log.i(TAG, e.toString());
+                    return 1;
                 }
-                return super.gopOnAnalysisVerifyUrl(jsonObject);
             }
 
             @Override
@@ -208,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public Map<String, String> gopOnVerifyUrlBody() {
-                // verifyUrl接口传入form数据对象,如果没有需要传入的数据可以返回为null，注意gopOnVerifyUrlJsonBody返回为null
+                // verifyUrl接口传入form数据对象,如果没有需要传入的数据可以返回为null，注意gopOnVerifyUrlJsonBody必须返回为null
                 HashMap<String, String> map = new HashMap<>();
                 // map.put("test","test");
                 return null;
@@ -216,12 +239,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public Map<String, String> gopOnVerifyUrlJsonBody() {
-                // verifyUrl接口传入json数据对象，如果没有需要传入数据返回一个未put数据map，注意gopOnVerifyUrlBody返回为null
+                // verifyUrl接口传入json数据对象，如果没有需要传入数据返回一个未put数据map，注意gopOnVerifyUrlBody必须返回为null
                 HashMap<String, String> map = new HashMap<>();
                 // map.put("test","test");
                 return null;
             }
 
+            /**
+             * @param b 是否需要自定义短信
+             * @param map 使用极验短信服务返回参数
+             * @param jsonObject 发送短信原因，具体参考GitHub文档
+             */
             @Override
             public void gopOnSendMsg(boolean b, Map<String, String> map, JSONObject jsonObject) {
                 /**
@@ -252,75 +280,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * onepass的方法，执行onepass只需拿到验证码的validate，兼容所有公版验证码
-     *
-     * @param validate
-     */
-    private void openOnePass(String validate) {
-        /**
-         *    第一参数为填写的手机号
-         *    第二个参数为验证后的validate
-         *    第三个参数为customid
-         *    第四个参数为回调
-         */
-        gopGeetestUtils.getOnePass(editText.getText().toString(), validate, CUSTOM_ID, baseGOPListener);
-    }
-
-
-    /**
-     * 判断数据网络是否开启
-     *
-     * @param context
-     * @return
-     */
-    private boolean haveIntent(Context context) {
-        boolean mobileDataEnabled = false; // Assume disabled
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        try {
-            Class cmClass = Class.forName(cm.getClass().getName());
-            Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
-            method.setAccessible(true); // Make the method callable
-            // get the setting for "mobile data"
-            mobileDataEnabled = (Boolean) method.invoke(cm);
-        } catch (Exception e) {
-            // Some problem accessible private API
-            // TODO do whatever error handling you want here
-        }
-        return mobileDataEnabled;
-    }
-
-    /**
-     * 判断手机号合法性
-     *
-     * @param phoneNumber 手机号
-     * @return
-     */
-    public boolean chargePhoneNum(String phoneNumber) {
-        String regExp = "^((13[0-9])|(15[^4])|(18[0-9])|(17[0-8])|(14[5-9])|(166)|(19[8,9])|)\\d{8}$";
-        Pattern p = Pattern.compile(regExp);
-        Matcher m = p.matcher(phoneNumber);
-        return m.matches();
-    }
-
-    /**
      * toast工具
      *
      * @param str
      */
     private void toastUtil(String str) {
-
         Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-        //销毁的时候执行
-        gopGeetestUtils.cancelUtils();
-
-
     }
 }

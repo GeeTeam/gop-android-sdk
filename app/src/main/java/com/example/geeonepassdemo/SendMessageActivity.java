@@ -110,7 +110,7 @@ public class SendMessageActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
 
-            return GOPGeetestUtils.gopCheckMsg(GOP_CHECK_MSG, mapcheck, "utf-8");
+            return GOPGeetestUtils.gopCheckMsg(GOP_CHECK_MSG, mapcheck);
         }
 
         @Override
