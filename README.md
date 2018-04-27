@@ -22,51 +22,56 @@ sdk三方依赖|无
 2. 在拖入`.aar`到libs文件夹后, 还要检查`.aar`是否被添加到**Library**,要在项目的
 build.gradle下添加如下代码：
 
-```java
-repositories {
-	flatDir {
-  		dirs 'libs'
+	```java
+	repositories {
+		flatDir {
+	  		dirs 'libs'
+		}
 	}
-}
+	
+	```
 
-```
+	并且要手动将aar包添加依赖：
 
-并且要手动将aar包添加依赖：
-
-```java
-compile(name: 'geetest_onepass_android_vx.y.z', ext: 'aar')
-
-``` 
+	```java
+	compile(name: 'geetest_onepass_android_vx.y.z', ext: 'aar')
+	
+	``` 
 
 3. 添加权限
 
-```java
- <uses-permission android:name="android.permission.WRITE_SETTINGS" />
- <uses-permission android:name="android.permission.READ_PHONE_STATE" />
- <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
- <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
- <uses-permission android:name="android.permission.INTERNET" />
- <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-
-```
+	```java
+	 <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+	 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+	 <uses-permission android:name="android.permission.INTERNET" />
+	 <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+	
+	```
 
 ## 配置接口
 
-开发者集成客户端sdk前, 必须先在您的服务器上搭建相应的**服务端SDK**，生成二次验证的接口即下文的**verifyUrl**。
+开发者集成客户端sdk前, 必须先在您的服务器上搭建相应的 **服务端SDK** ，配置 **verifyUrl** ，并配置从 **极验后台** 获取的customId。这里以服务端 **verifyUrl** 配置成功，客户端开发步骤为例，如下：
 
-集成用户需要使用Android SDK完成提供的以下接口:
+1. 配置初始化接口
 
-1. 配置并初始化
+	```java
+	GOPGeetestUtils.getInstance().init(MainActivity.this);
+	``` 
+
 2. 调用校验接口
-3. 处理结果
-4. 处理错误
 
->集成代码参考下方的**代码示例**
+	```java
+	GOPGeetestUtils.getInstance().getOnePass(phone, validate, CUSTOM_ID, gopLinster);
+	//第一个参数为输入的手机号码
+	//第二个参数为接入验证码SDK返回的validate(如果只接入onepass则传null)
+	//第三个参数为所需要配置的CUSTOM_ID
+	//第四个参数为所需实现监听回调结果接口
+	``` 
 
-## 编译并运行你的工程
-
-编译你的工程, 体验全新的极验onepass产品！
+>集成代码参考下方的 **代码示例** 
 
 # 代码示例
 
@@ -77,18 +82,14 @@ compile(name: 'geetest_onepass_android_vx.y.z', ext: 'aar')
 在项目的具体页面的`onCreate`方法里面进行初始化。
 	
 ```java
-gopGeetestUtils = GOPGeetestUtils.getInstance(MainActivity.this);
+GOPGeetestUtils.getInstance().init(MainActivity.this);
 
 ``` 
 
-### 点击执行
+### 调用校验
 
 ```java
-gopGeetestUtils.getOnePass( editText.getText().toString(),validate,CUSTOM_ID,gopLinster);
-//第一个参数为输入的手机号码
-//第二个参数为接入验证码SDK返回的validate(如果只接入onepass则传null)
-//第三个参数为所需要配置的CUSTOM_ID
-//第四个参数为所需接口
+GOPGeetestUtils.getInstance().getOnePass(phone, validate, CUSTOM_ID, gopLinster);
 
 ``` 
  
@@ -100,12 +101,12 @@ gopGeetestUtils.getOnePass( editText.getText().toString(),validate,CUSTOM_ID,gop
 BaseGOPListener gopLinster=new BaseGOPListener() {
 	@Override
 	public void gopOnError(String error) {
-		//过程中出现的错误
+		//过程中出现的错误, 具体参考下方错误码
 	}
 
 	@Override
 	public void gopOnSendMsg(boolean success,Map<String, String> result, JSONObject jsonObject) {
-		//sdk内部发送短信所需要的结果，当为true的时候表示sdk内部发送短信，false的时候自定义短信
+		//sdk内部发送短信所需要的结果，jsonObject为发送短信原因，当为true的时候表示sdk内部发送短信，false的时候自定义短信
 	}
 
 	@Override
@@ -115,10 +116,9 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 
 	@Override
     public String gopOnVerifyUrl() {
-    	//接入服务端SDK生成二次验证接口接口,
+    	//返回服务端配置的 verifyUrl
     	return GOP_VERIFYURL;
     }
-};
 
 	@Override
     public Map<String, String> gopOnVerifyUrlBody() {
@@ -144,8 +144,9 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
         map.put("Content-Type", "application/x-www-form-urlencoded");
         return null;
     }
+};
 ``` 
-额外接口实现。
+额外接口实现
 
 ```java
    gopOnDobble();此接口用于未收到短信，进行再次请求时调用,默认为false。
@@ -156,16 +157,17 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
    gopOnAnalysisVerifyUrl();此接口用于拿到校验的接口返回的参数,并获取返回值回传给sdk。
 
 ``` 
-``` 
-注意：verifyUrl接口只支持post，兼容form和json数据格式上行数据。
 
-Form：重写gopOnVerifyBody方法，返回上行body参数。如果没有参数则返回为null或者未put数据的map，注意gopOnVerifyUrlJsonBody方法返回未null或者不重写
-Json：重写gopOnVerifyUrlJsonBody方法，返回上行body参数，如果没有需要传输参数则返回未put数据的map。注意此时gopOnVerifyBody方法返回null或者不重写
+> 注意：verifyUrl接口只支持post，兼容form和json数据格式上行数据。
+>
+> Form表单：重写gopOnVerifyBody方法，返回上行body参数。如果没有参数则返回为null或者未put数据的map，注意gopOnVerifyUrlJsonBody方法返回未null或者不重写
+> 
+> Json格式：重写gopOnVerifyUrlJsonBody方法，返回上行body参数，如果没有需要传输参数则返回未put数据的map。注意此时gopOnVerifyBody方法返回null或者不重写
+>
+> 默认上行body参数包括phone，process_id，accesscode，custom等，不得在gopOnVerifyUrlBody或者gopOnVerifyUrlJsonBody方法重复传入
+> 
+> gopOnVerifyUrlHeaders方法传入verifyUrl接口需要的header参数
 
-默认上行body参数包括phone，process_id，accesscode，custom等，不得在gopOnVerifyUrlBody和gopOnVerifyUrlJsonBody方法重复传入
-
-gopOnVerifyUrlHeaders方法传入verifyUrl接口需要的header参数
-``` 
 ### 页面关闭
 
 在页面关闭的时候执行此方法。
@@ -174,22 +176,19 @@ gopOnVerifyUrlHeaders方法传入verifyUrl接口需要的header参数
 @Override
 protected void onDestroy() {
  	super.onDestroy();
- 	gopGeetestUtils.cancelUtils();
+ 	GOPGeetestUtils.getInstance().cancelUtils();
 }
 
 ``` 
 
 # SDK方法说明
 
-## 获取实例对象
+## 初始化
 
 ### 方法描述
-
-获取管理类的实例对象
-
 	
 ```
-public GOPGeetestUtils(Context context)
+public void init(Context context)
 ```
 
 ### 参数说明
@@ -198,14 +197,14 @@ public GOPGeetestUtils(Context context)
 ------	|-----|-----|
 context|Context|上下文|	
 
-## 获取校验结果
+## 调用校验
 
 ### 方法描述
 
 costomID：产品id，请在官网申请
 
 ```
-public void getOnePass(String phone,String validate,String customID,BaseGopListener gopListener)
+public void getOnePass(String phone, String validate, String customID, BaseGopListener gopListener)
 ```
 
 ### 参数说明
@@ -214,19 +213,14 @@ public void getOnePass(String phone,String validate,String customID,BaseGopListe
 ------	|-----|-----|
 phone|String|用户所填的手机号|
 validate|String|验证码SDK返回的validate，如果未接验证码则为null|
-customID|String|产品id|
+customID|String|极验后台配置唯一id|
 gopListener| BaseGopListener|回调监听器，需要开发者自己实现|
 
-### 代码示例
-
-```
-gopGeetestUtils.getOnePass(phone,validate，customid,gopListener)
-```
-
+## BaseGopListener实现接口
 
 ### 错误回调
 
-#### 方法说明
+##### 方法说明
 
 整个流程出现错误的时候调用
 	
@@ -268,7 +262,6 @@ result | String |verifyUrl的验证成功的结果|
 public String gopOnVerifyUrl()
 
 ```
-
 ### 处理短信参数回调
 
 #### 方法说明
@@ -276,7 +269,7 @@ public String gopOnVerifyUrl()
 整个流程进行发送短信调用
 	
 ```
-public gopOnSendMsg(boolean data，Map<String,String> result, JSONObject jsonObject)
+public gopOnSendMsg(boolean success，Map<String,String> result, JSONObject jsonObject)
 
 ```
 
@@ -284,7 +277,7 @@ public gopOnSendMsg(boolean data，Map<String,String> result, JSONObject jsonObj
 
 参数	|类型 |说明| 			
 ------	|-----|-----|
-data|boolean|客户所选择的短信发送业务，如果为false，则自定义短信发送，如果为true，则表示短信业务由onepass sdk内部发送|
+success |boolean|客户所选择的短信发送业务，如果为false，则自定义短信发送，如果为true，则表示短信业务由onepass sdk内部发送|
 result | Map |checkMessageUrl的请求参数|
 jsonObject|JSONObject|发送短信的原因,有token fail和verify fail两种|
 
@@ -318,11 +311,6 @@ public void cancelUtils()
 
 无
 
-### 代码示例
-
-```
-gopGeetestUtils.cancelUtils()
-```	
 ### 方法描述 
 获取SDK版本号
 
@@ -337,7 +325,7 @@ public void getVersion()
 ### 代码示例
 
 ```
-gopGeetestUtils.getVersion()
+GOPGeetestUtils.getInstance().getVersion()
 ```	
 
 ## 混淆规则
@@ -383,17 +371,19 @@ ErrorCode	|Description
 
 ## 常见错误
 
-### 1.总是报251，或者252，或者253错误？
+### 1. 总是报251，或者252，或者253错误？
 
 答：第一步：检查手机是否停机；第二步：若总是报251错误，检查测试apk的签名是否与在极验后台设置签名一致。总是报252错误请联系我们。总是报253错误请检查是否是2、3G网络联网（电信不支持2、3G网络进行网关验证）。
 
-### 2.总是报240错误？
+### 2. 总是报240错误？
 
 答：检查customId或者validate是否正确配置。
 
-### 3.总是报254，或者255，或者256错误？
+### 3. 总是报254，或者255，或者256错误？
 
 答：第一步：检查是否是本机号验证，检查是否是验证的手机号开启网络，确认是否是真机测试，确认verifyUrl接口为Post接口；第二步：检查verifyUrl接口是否配置正确（TAG为Geetest_GOP的Log可以看到是否成功）；第三步：打印gopOnAnalysisVerifyUrl回调的值，如果为0则成功，如果为1则失败，如果失败说明客户自己服务端接入失败，请客户服务端排查问题；第四步：如果gopOnAnalysisVerifyUrl未回调日志请参考demo打印日志。
+
+> 及时查看查看极验输出日志
 
 
 
