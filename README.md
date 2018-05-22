@@ -115,13 +115,13 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 	}
 
 	@Override
-    public String gopOnVerifyUrl() {
+	public String gopOnVerifyUrl() {
     	//返回服务端配置的 verifyUrl
     	return GOP_VERIFYURL;
     }
 
 	@Override
-    public Map<String, String> gopOnVerifyUrlBody() {
+	public Map<String, String> gopOnVerifyUrlBody() {
         // verifyUrl接口传入form数据对象
         HashMap<String, String> map = new HashMap<>();
         // map.put("test","test");
@@ -129,7 +129,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
     }
 
 	@Override
-    public Map<String, String> gopOnVerifyUrlJsonBody() {
+	public Map<String, String> gopOnVerifyUrlJsonBody() {
     	// verifyUrl接口传入json数据对象
     	HashMap<String, String> map = new HashMap<>();
     	// map.put("test","test");
@@ -224,9 +224,8 @@ gopListener| BaseGopListener|回调监听器，需要开发者自己实现|
 
 整个流程出现错误的时候调用
 	
-```
+```java
 public gopOnError(String error)
-
 ```
 
 #### 参数说明
@@ -241,9 +240,8 @@ error | String |错误码|
 
 整个流程网关成功之后调用
 	
-```
+```java
 public gopOnResult(String result)
-
 ```
 
 #### 参数说明
@@ -258,9 +256,8 @@ result | String |verifyUrl的验证成功的结果|
 
 回传verifyUrl
 
-```
+```java
 public String gopOnVerifyUrl()
-
 ```
 ### 处理短信参数回调
 
@@ -268,9 +265,8 @@ public String gopOnVerifyUrl()
 
 整个流程进行发送短信调用
 	
-```
+```java
 public gopOnSendMsg(boolean success，Map<String,String> result, JSONObject jsonObject)
-
 ```
 
 #### 参数说明

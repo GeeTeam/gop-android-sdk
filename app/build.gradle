@@ -28,5 +28,5 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:25.3.1'
-    compile(name: 'geetest_onepass_android_v1.4.0', ext: 'aar')
+    compile(name: 'geetest_onepass_android_v1.4.1', ext: 'aar')
 }
