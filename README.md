@@ -118,7 +118,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
 	public String gopOnVerifyUrl() {
     	//返回服务端配置的 verifyUrl
     	return GOP_VERIFYURL;
-    }
+        }
 
 	@Override
 	public Map<String, String> gopOnVerifyUrlBody() {
@@ -126,7 +126,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
         HashMap<String, String> map = new HashMap<>();
         // map.put("test","test");
         return null;
-    }
+        }
 
 	@Override
 	public Map<String, String> gopOnVerifyUrlJsonBody() {
@@ -134,7 +134,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
     	HashMap<String, String> map = new HashMap<>();
     	// map.put("test","test");
     	return null;
-    }
+        }
 
     @Override
     public Map<String, String> gopOnVerifyUrlHeaders() {
@@ -143,7 +143,7 @@ BaseGOPListener gopLinster=new BaseGOPListener() {
         // map.put("Content-Type","application/json;charset=UTF-8");
         map.put("Content-Type", "application/x-www-form-urlencoded");
         return null;
-    }
+        }
 };
 ``` 
 额外接口实现
@@ -378,6 +378,10 @@ ErrorCode	|Description
 ### 3. 总是报254，或者255，或者256错误？
 
 答：第一步：检查是否是本机号验证，检查是否是验证的手机号开启网络，确认是否是真机测试，确认verifyUrl接口为Post接口；第二步：检查verifyUrl接口是否配置正确（TAG为Geetest_GOP的Log可以看到是否成功）；第三步：打印gopOnAnalysisVerifyUrl回调的值，如果为0则成功，如果为1则失败，如果失败说明客户自己服务端接入失败，请客户服务端排查问题；第四步：如果gopOnAnalysisVerifyUrl未回调日志请参考demo打印日志。
+
+### 4. 全机型，全系统兼容吗？
+
+答：本产品只兼容4.0以上系统，但是在某些特殊定制的手机上，Wifi下走数据网络的方法没有返回，会造成网关验证失败。已经确认的机型有：乐视2。
 
 > 及时查看查看极验输出日志
 
