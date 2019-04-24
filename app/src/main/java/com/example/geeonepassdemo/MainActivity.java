@@ -62,13 +62,6 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setBackgroundDrawable(null);
         TextView textView = (TextView) findViewById(R.id.gtop_title_name);
         textView.setText(new GTMTextUtils().getText());
-        //拿到这个权限可以更方便的进行网关验证
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-        } else {
-            //TODO
-        }
         init();
         initGop();
     }
